@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-<WrapperComponent RouteDataInfo="data" @rendermode="Microsoft.AspNetCore.Components.Web.RenderMode.InteractiveAuto"></WrapperComponent>
+<WrapperComponent RouteDataInfo="RouteData" ></WrapperComponent>
 
 
 <link href="_content/AntDesign/css/ant-design-blazor.css" rel="stylesheet" />
@@ -8,7 +8,5 @@
 
 @code {
     [CascadingParameter]
-    public RouteData RouteData { get; set; }
-
-    private RouteDataInfo data => new RouteDataInfo(RouteData);
+    public RouteDataInfo RouteData { get; set; }
 }
