@@ -1,6 +1,7 @@
 using LayoutDemo.Client;
 using LayoutDemo.Client.Pages;
 using LayoutDemo.Components;
+using LayoutDemo.Components.State;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.StaticFiles;
@@ -19,6 +20,8 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddAntDesign();
 
+builder.Services.AddScoped<StateService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,10 +29,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
 
-
-        app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
-            string.Join("\n", endpointSources.SelectMany(source => source.Endpoints)));
-    
+    app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
+        string.Join("\n", endpointSources.SelectMany(source => source.Endpoints)));
 }
 else
 {
@@ -53,23 +54,14 @@ app.MapWhen(ctx => ctx.Request.Path.StartsWithSegments("/Admin"), second =>
     second.UseEndpoints(endpoints =>
     {
         endpoints.MapRazorComponents<App2>()
+        .AddInteractiveServerRenderMode()
          .AddInteractiveWebAssemblyRenderMode();
     });
 });
 
-app.MapWhen(ctx => ctx.Request.Path.StartsWithSegments("/Home"), first =>
-{
-
-    first.UseStaticFiles();
-    first.UseStaticFiles("/Home");
-    first.UseRouting();
-    first.UseEndpoints(endpoints =>
-    {
-        endpoints.MapRazorComponents<App>();
-    });
-});
-
-app.MapRazorComponents<App>().AddInteractiveWebAssemblyRenderMode();
+app.MapRazorComponents<App>()
+    .AddAdditionalAssemblies(typeof(App2).Assembly)
+    .AddInteractiveServerRenderMode()
+    .AddInteractiveWebAssemblyRenderMode();
 
 app.Run();
-

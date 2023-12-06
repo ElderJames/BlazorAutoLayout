@@ -1,0 +1,30 @@
+﻿@inject StateService State;
+
+
+
+@if (OnClick.HasDelegate)
+{
+    <form id="hover-form" method="post" @onsubmit="HandleOnClick" @formname="@($"onClick_{Id}")" data-enhance>
+        <AntiforgeryToken/>
+        <button @attributes="Attributes" type="submit">@ChildContent</button>
+    </form>
+}
+
+@code {
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string,object> Attributes { get; set; }
+
+    public int Id => State.GetIndex();
+
+    private void HandleOnClick(EventArgs _)
+    {
+        OnClick.InvokeAsync();
+    }
+}

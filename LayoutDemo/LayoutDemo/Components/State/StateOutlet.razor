@@ -1,0 +1,29 @@
+﻿@foreach (var state in objectStates)
+{
+    <input data-form="@state.Key" value="@System.Text.Json.JsonSerializer.Serialize(state.Value)" />
+}
+
+@inject StateService State;
+
+
+@code {
+
+    Dictionary<string, ObjectState> objectStates = [];
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        State.OnStateChanged += OnStateChange;
+    }
+
+    private void OnStateChange(string formKey, ObjectState state)
+    {
+        if (!objectStates.TryAdd(formKey, state))
+        {
+            objectStates[formKey] = state;
+        }
+
+        StateHasChanged();
+    }
+}

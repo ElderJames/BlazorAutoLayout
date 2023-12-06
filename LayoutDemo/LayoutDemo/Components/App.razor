@@ -14,7 +14,35 @@
 
 <body>
     <Routes />
+
+    <StateOutlet />
+
+    <AntDesign.AntContainer @rendermode="InteractiveWebAssembly"></AntDesign.AntContainer>
     <script src="_framework/blazor.web.js"></script>
+
+    <script>
+
+        // An enhanced load allows users to navigate between different pages
+        window.Blazor.addEventListener("enhancedload", function () {
+            const stateInput = document.querySelector('#view_state');
+            if (!stateInput)
+                return;
+            document.querySelectorAll('form').forEach(form => {
+
+                var hiddenInput = form.querySelector('[name=view_state]');
+                if (!hiddenInput) {
+
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.setAttribute('type', 'hidden');
+                    hiddenInput.setAttribute('name', 'view_state');
+                    form.appendChild(hiddenInput);
+                }
+
+                hiddenInput.setAttribute('value', stateInput.value);
+
+            });
+        });
+    </script>
 </body>
 
 </html>
