@@ -25,7 +25,7 @@ namespace LayoutDemo.Components.State
             var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (var property in properties)
             {
-                if (property.Name == nameof(StatefulComponentBase.ViewState))
+                if (property.PropertyType == typeof(RenderFragment))
                 {
                     continue;
                 }
@@ -37,6 +37,11 @@ namespace LayoutDemo.Components.State
             var fields = obj.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             foreach (var field in fields)
             {
+                if (field.FieldType == typeof(RenderFragment))
+                {
+                    continue;
+                }
+
                 state.Fields[field.Name] = field.GetValue(obj);
             }
 
@@ -51,15 +56,29 @@ namespace LayoutDemo.Components.State
             // 设置属性的值
             foreach (var propertyPair in state.Properties)
             {
-                var propertyInfo = obj.GetType().GetProperty(propertyPair.Key, BindingFlags.Public | BindingFlags.Instance);
-                propertyInfo?.SetValue(obj, ((JsonElement)propertyPair.Value).Deserialize(propertyInfo.PropertyType));
+                try
+                {
+                    var propertyInfo = obj.GetType().GetProperty(propertyPair.Key, BindingFlags.Public | BindingFlags.Instance);
+                    propertyInfo?.SetValue(obj, ((JsonElement)propertyPair.Value).Deserialize(propertyInfo.PropertyType));
+                }
+                catch
+                {
+                    continue;
+                }
             }
 
             // 设置字段的值
             foreach (var fieldPair in state.Fields)
             {
-                var fieldInfo = obj.GetType().GetField(fieldPair.Key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                fieldInfo?.SetValue(obj, ((JsonElement)fieldPair.Value).Deserialize(fieldInfo.FieldType));
+                try
+                {
+                    var fieldInfo = obj.GetType().GetField(fieldPair.Key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    fieldInfo?.SetValue(obj, ((JsonElement)fieldPair.Value).Deserialize(fieldInfo.FieldType));
+                }
+                catch
+                {
+                    continue;
+                }
             }
         }
     }

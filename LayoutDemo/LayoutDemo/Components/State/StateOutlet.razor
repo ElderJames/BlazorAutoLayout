@@ -1,8 +1,10 @@
-﻿@foreach (var state in objectStates)
-{
-    <input data-form="@state.Key" value="@System.Text.Json.JsonSerializer.Serialize(state.Value)" />
-}
-
+﻿
+<div style="display:none;" id="state">
+    @foreach (var state in objectStates)
+    {
+        <input data-form="@state.Key" value="@System.Text.Json.JsonSerializer.Serialize(state.Value)" />
+    }
+</div>
 @inject StateService State;
 
 
@@ -13,7 +15,7 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-
+        State.Reset();
         State.OnStateChanged += OnStateChange;
     }
 

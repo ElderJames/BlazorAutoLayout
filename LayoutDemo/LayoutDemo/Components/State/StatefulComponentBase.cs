@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Endpoints;
+using Microsoft.AspNetCore.Components.Forms.Mapping;
+using Microsoft.Extensions.Primitives;
 using System.Reflection;
 using System.Text.Json;
 
@@ -6,39 +9,29 @@ namespace LayoutDemo.Components.State
 {
     public class StatefulComponentBase : ComponentBase
     {
-        [SupplyParameterFromForm(Name = "view_state")]
-        public string ViewState { get; set; }
-
         [Inject] public StateService State { get; set; }
+
+        protected int Id { get; set; }
+
+        [Inject] private IFormValueMapper FormValueMapper { get; set; }
+
+        [Inject] private IComponentPrerenderer ComponentPrerenderer { get; set; }
 
         public override Task SetParametersAsync(ParameterView parameters)
         {
-            var viewState = parameters.GetValueOrDefault<string>(nameof(ViewState));
-            if (!string.IsNullOrWhiteSpace(viewState))
+            if (Id <= 0)
             {
-                var state = JsonSerializer.Deserialize<ObjectState>(viewState);
-                ObjectStateHelper.SetObjectState(this, state);
+                Id = State.GetIndex();
             }
+
+            State.Restore(Id, this);
 
             return base.SetParametersAsync(parameters);
         }
 
         protected override bool ShouldRender()
         {
-            //// 获取BaseClass类型的Type对象
-            //Type baseType = typeof(ComponentBase);
-
-            //// 使用反射获取私有字段的FieldInfo
-            //FieldInfo fieldInfo = baseType.GetField("_renderFragment", BindingFlags.NonPublic | BindingFlags.Instance);
-
-            //if (fieldInfo != null)
-            //{
-            //    var old = fieldInfo.GetValue(this);
-            //    // 使用反射来设置私有字段的值
-            //    fieldInfo.SetValue(this, NewRenderFragment((RenderFragment)old));
-            //}
-            var index = State.GetIndex();
-            State.StateChange($"view_state_{index}", ObjectStateHelper.GetObjectState(this));
+            State.StateChange($"view_state_{Id}", this);
 
             return base.ShouldRender();
         }

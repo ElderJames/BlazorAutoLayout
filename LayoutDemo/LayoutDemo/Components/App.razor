@@ -24,22 +24,24 @@
 
         // An enhanced load allows users to navigate between different pages
         window.Blazor.addEventListener("enhancedload", function () {
-            const stateInput = document.querySelector('#view_state');
-            if (!stateInput)
+            const stateInputList = document.querySelectorAll('#state input');
+            console.log(stateInputList)
+            if (stateInputList.length <= 0)
                 return;
+
             document.querySelectorAll('form').forEach(form => {
+                var existing = form.querySelectorAll('[data-form]');
+                existing.forEach(el => el.remove());
 
-                var hiddenInput = form.querySelector('[name=view_state]');
-                if (!hiddenInput) {
+                stateInputList.forEach(state => {
+                    let input = document.createElement('input');
+                    input.setAttribute('type', 'hidden');
+                    input.setAttribute('data-form', state.dataset.form)
+                    input.setAttribute('name', state.dataset.form);
+                    input.setAttribute('value', state.value);
 
-                    hiddenInput = document.createElement('input');
-                    hiddenInput.setAttribute('type', 'hidden');
-                    hiddenInput.setAttribute('name', 'view_state');
-                    form.appendChild(hiddenInput);
-                }
-
-                hiddenInput.setAttribute('value', stateInput.value);
-
+                    form.appendChild(input);
+                })
             });
         });
     </script>
