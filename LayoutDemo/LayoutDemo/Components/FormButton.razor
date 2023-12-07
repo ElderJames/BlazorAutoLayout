@@ -1,11 +1,15 @@
 ﻿@inject StateService State;
 @inherits StatefulComponentBase
 
+
+@Render()
+
 @if (OnClick.HasDelegate)
 {
-    <form id="hover-form" method="post" @onsubmit="HandleOnClick" @formname="@($"button_{Id}")" data-enhance>
+    <form method="post" @onsubmit="HandleOnClick" @formname="@($"state_form_{Id}")"  data-enhance>
         <AntiforgeryToken />
-        <button @attributes="Attributes" type="submit">@ChildContent</button>
+
+        <button style="display:none;" type="submit" id="@($"state_form_{Id}")"></button>
     </form>
 }
 
@@ -20,13 +24,25 @@
     [Parameter(CaptureUnmatchedValues = true)]
     public IDictionary<string, object> Attributes { get; set; }
 
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-    }
+    [Parameter]
+    public string Tag { get; set; }
+
 
     private void HandleOnClick(EventArgs _)
     {
         OnClick.InvokeAsync();
+    }
+
+    private RenderFragment Render()
+    {
+        var submitScript = $@"document.querySelector(""#state_form_{Id}"").click()";
+        Attributes.Add("onclick", submitScript);
+        return builder =>
+        {
+            builder.OpenElement(0, Tag);
+            builder.AddMultipleAttributes(1, Attributes);
+            builder.AddContent(2, ChildContent);
+            builder.CloseElement();
+        };
     }
 }
