@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Endpoints;
 using Microsoft.AspNetCore.Components.Forms.Mapping;
 using Microsoft.Extensions.Primitives;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using System.Text.Json;
 
@@ -9,13 +10,11 @@ namespace LayoutDemo.Components.State
 {
     public class StatefulComponentBase : ComponentBase
     {
+        [NotMapped]
         [Inject] public StateService State { get; set; }
 
+        [NotMapped]
         protected int Id { get; set; }
-
-        [Inject] private IFormValueMapper FormValueMapper { get; set; }
-
-        [Inject] private IComponentPrerenderer ComponentPrerenderer { get; set; }
 
         public override Task SetParametersAsync(ParameterView parameters)
         {

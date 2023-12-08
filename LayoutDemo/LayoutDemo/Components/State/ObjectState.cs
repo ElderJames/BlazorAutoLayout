@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using System.Text.Json;
 
@@ -30,6 +31,9 @@ namespace LayoutDemo.Components.State
                     continue;
                 }
 
+                if (property.GetCustomAttribute<NotMappedAttribute>() != null)
+                    continue;
+
                 state.Properties[property.Name] = property.GetValue(obj);
             }
 
@@ -41,6 +45,9 @@ namespace LayoutDemo.Components.State
                 {
                     continue;
                 }
+
+                if (field.GetCustomAttribute<NotMappedAttribute>() != null)
+                    continue;
 
                 state.Fields[field.Name] = field.GetValue(obj);
             }
@@ -58,7 +65,10 @@ namespace LayoutDemo.Components.State
             {
                 try
                 {
-                    var propertyInfo = obj.GetType().GetProperty(propertyPair.Key, BindingFlags.Public | BindingFlags.Instance);
+                    var propertyInfo = obj.GetType().GetProperty(propertyPair.Key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    if (propertyInfo.GetCustomAttribute<NotMappedAttribute>() != null)
+                        continue;
+
                     propertyInfo?.SetValue(obj, ((JsonElement)propertyPair.Value).Deserialize(propertyInfo.PropertyType));
                 }
                 catch
@@ -73,6 +83,9 @@ namespace LayoutDemo.Components.State
                 try
                 {
                     var fieldInfo = obj.GetType().GetField(fieldPair.Key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    if (fieldInfo.GetCustomAttribute<NotMappedAttribute>() != null)
+                        continue;
+
                     fieldInfo?.SetValue(obj, ((JsonElement)fieldPair.Value).Deserialize(fieldInfo.FieldType));
                 }
                 catch
