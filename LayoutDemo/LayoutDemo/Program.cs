@@ -1,15 +1,8 @@
+using LayoutDemo;
 using LayoutDemo.Client;
-using LayoutDemo.Client.Pages;
 using LayoutDemo.Components;
 using LayoutDemo.Components.State;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http.Connections;
-using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Net.Http.Headers;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Resources;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +12,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddAntDesign();
+builder.Services.AddScoped<IWeatherService, WeatherService>();
 
 builder.Services.AddScoped<StateService>();
 
@@ -43,6 +37,8 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.MapWeatherEndpoints();
 
 app.MapWhen(ctx => ctx.Request.Path.StartsWithSegments("/Admin"), second =>
 {
