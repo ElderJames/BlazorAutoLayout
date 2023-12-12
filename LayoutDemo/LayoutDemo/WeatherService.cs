@@ -1,18 +1,10 @@
-﻿
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
 namespace LayoutDemo
 {
     public class WeatherService : IWeatherService
     {
-        private readonly PersistentComponentState _state;
-
-        public WeatherService(PersistentComponentState state)
-        {
-            _state = state;
-        }
-
         public async Task<IEnumerable<WeatherForecast>> GetForecasts()
         {
             // Simulate asynchronous loading to demonstrate streaming rendering
@@ -26,15 +18,6 @@ namespace LayoutDemo
                 TemperatureC = Random.Shared.Next(-20, 55),
                 Summary = summaries[Random.Shared.Next(summaries.Length)]
             }).ToArray();
-
-            PersistingComponentStateSubscription? subscription = null;
-
-            subscription = _state.RegisterOnPersisting(() =>
-               {
-                   _state.PersistAsJson(nameof(GetForecasts), forecasts);
-                   subscription?.Dispose();
-                   return Task.CompletedTask;
-               }, RenderMode.InteractiveWebAssembly);
 
             return forecasts;
         }

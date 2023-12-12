@@ -1,6 +1,8 @@
 using LayoutDemo;
 using LayoutDemo.Client;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -13,6 +15,6 @@ builder.Services.AddHttpClient("API", options =>
 
 builder.Services.AddTransient(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("API"));
 
-builder.Services.AddScoped<IWeatherService, WeatherApiClient>();
+builder.Services.AddScoped<IWeatherService>(sp => new WeatherApiClient(sp.GetRequiredService<PersistentComponentState>(), sp.GetRequiredService<HttpClient>()));
 
 await builder.Build().RunAsync();

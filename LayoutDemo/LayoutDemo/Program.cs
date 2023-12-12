@@ -2,6 +2,8 @@ using LayoutDemo;
 using LayoutDemo.Client;
 using LayoutDemo.Components;
 using LayoutDemo.Components.State;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Http;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,9 +14,28 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddAntDesign();
-builder.Services.AddScoped<IWeatherService, WeatherService>();
+builder.Services.AddScoped<IWeatherService>(sp=>new WeatherApiClient(sp.GetRequiredService<PersistentComponentState>(), ActivatorUtilities.CreateInstance<WeatherService>(sp)));
 
 builder.Services.AddScoped<StateService>();
+
+builder.Services.AddHttpClient("API");
+
+builder.Services.AddTransient(sp =>
+{
+    var client = sp.GetRequiredService<IHttpClientFactory>().CreateClient("API");
+    var httpContext = sp.GetService<IHttpContextAccessor>()?.HttpContext;
+    if (httpContext == null)
+    {
+        client.BaseAddress = new Uri("https://localhost:80");
+        return client;
+    }
+
+    var request = httpContext.Request;
+    var host = request.Host.ToUriComponent();
+    var scheme = request.Scheme;
+    var baseAddress = $"{scheme}://{host}";
+    return client;
+});
 
 var app = builder.Build();
 
