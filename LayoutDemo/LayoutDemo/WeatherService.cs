@@ -11,7 +11,10 @@ namespace LayoutDemo
             await Task.Delay(500);
 
             var startDate = DateOnly.FromDateTime(DateTime.Now);
-            var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
+            var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", 
+                "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+            };
+
             var forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = startDate.AddDays(index),

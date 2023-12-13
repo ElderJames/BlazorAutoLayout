@@ -11,8 +11,8 @@ namespace LayoutDemo
             {
                 return await service.GetForecasts();
             })
-                .WithName("GetAllWeather")
-                .Produces<IEnumerable<WeatherForecast>>(StatusCodes.Status200OK);
+            .WithName("GetAllWeather")
+            .Produces<IEnumerable<WeatherForecast>>(StatusCodes.Status200OK);
         }
     }
 }

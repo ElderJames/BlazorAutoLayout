@@ -25,32 +25,28 @@ namespace LayoutDemo.Client
 
         public async Task<IEnumerable<WeatherForecast>?> GetForecasts()
         {
-            if (OperatingSystem.IsBrowser())
+            if (_state.TryTakeFromJson<IEnumerable<WeatherForecast>>(nameof(GetForecasts), out var weathers))
             {
-                if (!_state.TryTakeFromJson<IEnumerable<WeatherForecast>>(nameof(GetForecasts), out var weathers))
-                {
-                    return weathers;
-                }
-                else
-                {
-                    return await _httpClient.GetFromJsonAsync<IEnumerable<WeatherForecast>>("/api/weather");
-                }
+                return weathers;
+            }
+            else if (OperatingSystem.IsBrowser())
+            {
+                return await _httpClient.GetFromJsonAsync<IEnumerable<WeatherForecast>>("/api/weather");
             }
             else
             {
-                if (_service == null)
-                    return [];
-
                 var forecasts = await _service.GetForecasts();
 
                 PersistingComponentStateSubscription? subscription = null;
+
+                var isServer = OperatingSystem.IsWindows() || OperatingSystem.IsLinux();
 
                 subscription = _state.RegisterOnPersisting(() =>
                 {
                     _state.PersistAsJson(nameof(GetForecasts), forecasts);
                     subscription?.Dispose();
                     return Task.CompletedTask;
-                }, RenderMode.InteractiveWebAssembly);
+                }, isServer ? RenderMode.InteractiveServer : RenderMode.InteractiveWebAssembly);
 
                 return forecasts;
             }
