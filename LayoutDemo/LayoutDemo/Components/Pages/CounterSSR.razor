@@ -1,0 +1,25 @@
+﻿@page "/counter"
+
+<PageTitle>Counter</PageTitle>
+
+<h1>SSR Interactivity</h1>
+
+<p role="status">Current count: @CurrentCount</p>
+
+<form method="post" data-enhance @onsubmit="IncrementCount" @formname="counter">
+    <AntiforgeryToken />
+    <input type="hidden" value="@CurrentCount" name="currentCount"/>
+
+    <button class="btn btn-primary" type="submit">Click me</button>
+</form>
+
+@code {
+
+    [SupplyParameterFromForm(Name = "currentCount")]
+    public int CurrentCount { get; set; }
+
+    private void IncrementCount()
+    {
+        CurrentCount++;
+    }
+}

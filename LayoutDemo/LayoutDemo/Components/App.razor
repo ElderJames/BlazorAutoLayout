@@ -17,7 +17,6 @@
 
     <StateOutlet />
 
-    <AntDesign.AntContainer @rendermode="InteractiveWebAssembly"></AntDesign.AntContainer>
     <script src="_framework/blazor.web.js"></script>
 
     <script>
@@ -25,7 +24,7 @@
         // An enhanced load allows users to navigate between different pages
         window.Blazor.addEventListener("enhancedload", function () {
             const stateInputList = document.querySelectorAll('#state input');
-            console.log(stateInputList)
+
             if (stateInputList.length <= 0)
                 return;
 
